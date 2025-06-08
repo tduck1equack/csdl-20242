@@ -302,32 +302,20 @@ export default function LibrarianDashboard() {
 
   const fetchBorrowingUsers = async () => {
     setLoadingUsers(true);
-    console.log(
-      "🔍 fetchBorrowingUsers: Starting to fetch users with borrowings"
-    );
     try {
       const response = await fetch(
         "/api/librarian/users?includeBorrowings=true"
       );
-      console.log("🔍 fetchBorrowingUsers: Response status:", response.status);
       if (response.ok) {
         const data = await response.json();
-        console.log("🔍 fetchBorrowingUsers: Raw API response:", data);
 
         const usersWithBorrowings = data.users.filter(
           (user: UserWithBorrowings) => user.borrowings.length > 0
         );
-        console.log(
-          "🔍 fetchBorrowingUsers: Filtered users with borrowings:",
-          usersWithBorrowings
-        );
 
         setBorrowingUsers(usersWithBorrowings);
       } else {
-        console.error(
-          "🔍 fetchBorrowingUsers: Response not ok:",
-          response.statusText
-        );
+        console.error(response.statusText);
       }
     } catch (error) {
       console.error("Error fetching borrowing users:", error);
