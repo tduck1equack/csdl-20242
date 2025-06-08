@@ -110,7 +110,10 @@ async function main() {
     )
   );
 
-  console.log("Created users:", users.map((u) => u.email));
+  console.log(
+    "Created users:",
+    users.map((u) => u.email)
+  );
 
   // Create genres
   const genres = await Promise.all([
@@ -164,9 +167,12 @@ async function main() {
     }),
   ]);
 
-  console.log("Created genres:", genres.map((g) => g.name));
+  console.log(
+    "Created genres:",
+    genres.map((g) => g.name)
+  );
 
-  // Create books with proper data
+  // Create books with proper data - expanded collection
   const booksData = [
     {
       title: "To Kill a Mockingbird",
@@ -312,19 +318,596 @@ async function main() {
       condition: "NEW" as const,
       genres: ["Biography", "Non-Fiction"],
     },
+    // Additional books for expanded collection
+    {
+      title: "Pride and Prejudice",
+      author: "Jane Austen",
+      isbn: "9780141439518",
+      publishedYear: 1813,
+      publisher: "T. Egerton",
+      language: "English",
+      pageCount: 432,
+      description:
+        "A romantic novel of manners set in Georgian England, following Elizabeth Bennet and her complex relationship with Mr. Darcy.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "A-004",
+      deweyDecimal: "823.7",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Fiction", "Classic"],
+    },
+    {
+      title: "The Lord of the Rings: The Fellowship of the Ring",
+      author: "J.R.R. Tolkien",
+      isbn: "9780547928210",
+      publishedYear: 1954,
+      publisher: "George Allen & Unwin",
+      language: "English",
+      pageCount: 423,
+      description:
+        "The first volume of the epic fantasy trilogy following Frodo Baggins on his quest to destroy the One Ring.",
+      totalCopies: 4,
+      availableCopies: 3,
+      location: "F-001",
+      deweyDecimal: "823.912",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Fiction", "Science Fiction"],
+    },
+    {
+      title: "The Catcher in the Rye",
+      author: "J.D. Salinger",
+      isbn: "9780316769174",
+      publishedYear: 1951,
+      publisher: "Little, Brown and Company",
+      language: "English",
+      pageCount: 277,
+      description:
+        "A coming-of-age story narrated by the cynical teenager Holden Caulfield during his few days in New York City.",
+      totalCopies: 3,
+      availableCopies: 2,
+      location: "A-005",
+      deweyDecimal: "813.54",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Fiction", "Classic"],
+    },
+    {
+      title: "Harry Potter and the Philosopher's Stone",
+      author: "J.K. Rowling",
+      isbn: "9780747532699",
+      publishedYear: 1997,
+      publisher: "Bloomsbury",
+      language: "English",
+      pageCount: 223,
+      description:
+        "The first book in the Harry Potter series, following young Harry as he discovers his magical heritage and attends Hogwarts.",
+      totalCopies: 5,
+      availableCopies: 4,
+      location: "F-002",
+      deweyDecimal: "823.914",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Fiction", "Science Fiction"],
+    },
+    {
+      title: "The Da Vinci Code",
+      author: "Dan Brown",
+      isbn: "9780307474278",
+      publishedYear: 2003,
+      publisher: "Doubleday",
+      language: "English",
+      pageCount: 454,
+      description:
+        "A mystery thriller involving symbologist Robert Langdon's investigation of a murder in the Louvre Museum.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "C-002",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Mystery", "Fiction"],
+    },
+    {
+      title: "The Alchemist",
+      author: "Paulo Coelho",
+      isbn: "9780062315007",
+      publishedYear: 1988,
+      publisher: "HarperOne",
+      language: "English",
+      pageCount: 163,
+      description:
+        "A philosophical novel about a young Andalusian shepherd's journey to the Egyptian pyramids in search of treasure.",
+      totalCopies: 4,
+      availableCopies: 4,
+      location: "A-006",
+      deweyDecimal: "869.3",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Fiction"],
+    },
+    {
+      title: "Brave New World",
+      author: "Aldous Huxley",
+      isbn: "9780060850524",
+      publishedYear: 1932,
+      publisher: "Chatto & Windus",
+      language: "English",
+      pageCount: 311,
+      description:
+        "A dystopian social science fiction novel set in a futuristic World State of genetically modified citizens.",
+      totalCopies: 2,
+      availableCopies: 2,
+      location: "B-003",
+      deweyDecimal: "823.912",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Fiction", "Science Fiction", "Classic"],
+    },
+    {
+      title: "The Hobbit",
+      author: "J.R.R. Tolkien",
+      isbn: "9780547928227",
+      publishedYear: 1937,
+      publisher: "George Allen & Unwin",
+      language: "English",
+      pageCount: 310,
+      description:
+        "A fantasy novel about hobbit Bilbo Baggins's unexpected journey with a group of dwarves to reclaim their mountain home.",
+      totalCopies: 4,
+      availableCopies: 3,
+      location: "F-003",
+      deweyDecimal: "823.912",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Fiction", "Science Fiction"],
+    },
+    {
+      title: "Animal Farm",
+      author: "George Orwell",
+      isbn: "9780452284241",
+      publishedYear: 1945,
+      publisher: "Secker & Warburg",
+      language: "English",
+      pageCount: 112,
+      description:
+        "An allegorical novella about a group of farm animals who rebel against their human farmer.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "A-007",
+      deweyDecimal: "823.912",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Fiction", "Classic"],
+    },
+    {
+      title: "The Girl with the Dragon Tattoo",
+      author: "Stieg Larsson",
+      isbn: "9780307269751",
+      publishedYear: 2005,
+      publisher: "Norstedts Förlag",
+      language: "English",
+      pageCount: 590,
+      description:
+        "A psychological thriller about journalist Mikael Blomkvist and hacker Lisbeth Salander investigating a wealthy family's dark secrets.",
+      totalCopies: 2,
+      availableCopies: 1,
+      location: "C-003",
+      deweyDecimal: "839.738",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Mystery", "Fiction"],
+    },
+    {
+      title: "The Kite Runner",
+      author: "Khaled Hosseini",
+      isbn: "9781594631931",
+      publishedYear: 2003,
+      publisher: "Riverhead Books",
+      language: "English",
+      pageCount: 371,
+      description:
+        "A story of friendship and redemption set against the tumultuous backdrop of Afghanistan's recent history.",
+      totalCopies: 3,
+      availableCopies: 2,
+      location: "A-008",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Fiction"],
+    },
+    {
+      title: "Life of Pi",
+      author: "Yann Martel",
+      isbn: "9780156027328",
+      publishedYear: 2001,
+      publisher: "Knopf Canada",
+      language: "English",
+      pageCount: 319,
+      description:
+        "A philosophical adventure novel about a young Indian boy stranded on a lifeboat in the Pacific Ocean with a Bengal tiger.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "A-009",
+      deweyDecimal: "813.54",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Fiction"],
+    },
+    {
+      title: "The Fault in Our Stars",
+      author: "John Green",
+      isbn: "9780525478812",
+      publishedYear: 2012,
+      publisher: "Dutton Books",
+      language: "English",
+      pageCount: 313,
+      description:
+        "A young adult novel about two teenagers with cancer who fall in love after meeting in a support group.",
+      totalCopies: 4,
+      availableCopies: 4,
+      location: "A-010",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Fiction"],
+    },
+    {
+      title: "Gone Girl",
+      author: "Gillian Flynn",
+      isbn: "9780307588371",
+      publishedYear: 2012,
+      publisher: "Crown Publishing Group",
+      language: "English",
+      pageCount: 419,
+      description:
+        "A psychological thriller about a marriage gone terribly wrong when Amy Dunne disappears on her fifth wedding anniversary.",
+      totalCopies: 2,
+      availableCopies: 1,
+      location: "C-004",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Mystery", "Fiction"],
+    },
+    {
+      title: "The Book Thief",
+      author: "Markus Zusak",
+      isbn: "9780375842207",
+      publishedYear: 2005,
+      publisher: "Picador",
+      language: "English",
+      pageCount: 552,
+      description:
+        "A novel narrated by Death about a young girl living with foster parents in Nazi Germany who finds solace in stealing books.",
+      totalCopies: 3,
+      availableCopies: 2,
+      location: "A-011",
+      deweyDecimal: "823.92",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Fiction"],
+    },
+    {
+      title: "The Martian",
+      author: "Andy Weir",
+      isbn: "9780553418026",
+      publishedYear: 2011,
+      publisher: "Crown Publishing Group",
+      language: "English",
+      pageCount: 369,
+      description:
+        "A science fiction novel about an astronaut stranded on Mars who must survive using his ingenuity and scientific knowledge.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "B-004",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Science Fiction", "Fiction"],
+    },
+    {
+      title: "The Silence of the Lambs",
+      author: "Thomas Harris",
+      isbn: "9780312924584",
+      publishedYear: 1988,
+      publisher: "St. Martin's Press",
+      language: "English",
+      pageCount: 352,
+      description:
+        "A psychological horror novel featuring FBI trainee Clarice Starling and the brilliant but dangerous Dr. Hannibal Lecter.",
+      totalCopies: 2,
+      availableCopies: 2,
+      location: "C-005",
+      deweyDecimal: "813.54",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Mystery", "Fiction"],
+    },
+    {
+      title: "Educated",
+      author: "Tara Westover",
+      isbn: "9780399590504",
+      publishedYear: 2018,
+      publisher: "Random House",
+      language: "English",
+      pageCount: 334,
+      description:
+        "A memoir about a woman who grows up in a survivalist Mormon family and eventually pursues higher education.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "E-002",
+      deweyDecimal: "371.829",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Biography", "Non-Fiction"],
+    },
+    {
+      title: "Becoming",
+      author: "Michelle Obama",
+      isbn: "9781524763138",
+      publishedYear: 2018,
+      publisher: "Crown Publishing Group",
+      language: "English",
+      pageCount: 448,
+      description:
+        "The memoir of former First Lady Michelle Obama, chronicling her life from childhood to her years in the White House.",
+      totalCopies: 4,
+      availableCopies: 4,
+      location: "E-003",
+      deweyDecimal: "973.932",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Biography", "Non-Fiction"],
+    },
+    {
+      title: "The Subtle Art of Not Giving a F*ck",
+      author: "Mark Manson",
+      isbn: "9780062457714",
+      publishedYear: 2016,
+      publisher: "HarperOne",
+      language: "English",
+      pageCount: 224,
+      description:
+        "A counterintuitive approach to living a good life by focusing only on what truly matters and letting go of the rest.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "D-002",
+      deweyDecimal: "158.1",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Non-Fiction"],
+    },
+    {
+      title: "Atomic Habits",
+      author: "James Clear",
+      isbn: "9780735211292",
+      publishedYear: 2018,
+      publisher: "Avery",
+      language: "English",
+      pageCount: 320,
+      description:
+        "A comprehensive guide to building good habits and breaking bad ones through tiny changes that lead to remarkable results.",
+      totalCopies: 4,
+      availableCopies: 4,
+      location: "D-003",
+      deweyDecimal: "158.1",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Non-Fiction"],
+    },
+    {
+      title: "The 7 Habits of Highly Effective People",
+      author: "Stephen R. Covey",
+      isbn: "9781451639619",
+      publishedYear: 1989,
+      publisher: "Free Press",
+      language: "English",
+      pageCount: 381,
+      description:
+        "A self-help book presenting an approach to being effective in attaining goals by aligning oneself to principles.",
+      totalCopies: 3,
+      availableCopies: 2,
+      location: "D-004",
+      deweyDecimal: "158",
+      format: "PHYSICAL" as const,
+      condition: "GOOD" as const,
+      genres: ["Non-Fiction"],
+    },
+    {
+      title: "Where the Crawdads Sing",
+      author: "Delia Owens",
+      isbn: "9780735219090",
+      publishedYear: 2018,
+      publisher: "G.P. Putnam's Sons",
+      language: "English",
+      pageCount: 370,
+      description:
+        "A mystery novel about a young woman who raised herself in the marshes of North Carolina and becomes a suspect in a murder case.",
+      totalCopies: 3,
+      availableCopies: 2,
+      location: "C-006",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Mystery", "Fiction"],
+    },
+    {
+      title: "The Seven Husbands of Evelyn Hugo",
+      author: "Taylor Jenkins Reid",
+      isbn: "9781501161933",
+      publishedYear: 2017,
+      publisher: "Atria Books",
+      language: "English",
+      pageCount: 400,
+      description:
+        "A captivating novel about a reclusive Hollywood icon who finally decides to tell her story to a young journalist.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "A-012",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Fiction"],
+    },
+    {
+      title: "Circe",
+      author: "Madeline Miller",
+      isbn: "9780316556347",
+      publishedYear: 2018,
+      publisher: "Little, Brown and Company",
+      language: "English",
+      pageCount: 393,
+      description:
+        "A novel that tells the story of Circe, the Greek goddess of magic, and her journey from a nymph to a powerful witch.",
+      totalCopies: 2,
+      availableCopies: 2,
+      location: "F-004",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Fiction", "Science Fiction"],
+    },
+    {
+      title: "Project Hail Mary",
+      author: "Andy Weir",
+      isbn: "9780593135204",
+      publishedYear: 2021,
+      publisher: "Ballantine Books",
+      language: "English",
+      pageCount: 496,
+      description:
+        "A science fiction novel about a lone astronaut who must save humanity from extinction while dealing with memory loss.",
+      totalCopies: 2,
+      availableCopies: 2,
+      location: "B-005",
+      deweyDecimal: "813.6",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Science Fiction", "Fiction"],
+    },
+    {
+      title: "The Thursday Murder Club",
+      author: "Richard Osman",
+      isbn: "9781984880567",
+      publishedYear: 2020,
+      publisher: "Pamela Dorman Books",
+      language: "English",
+      pageCount: 368,
+      description:
+        "A mystery novel about four unlikely friends in a retirement village who meet weekly to investigate cold cases.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "C-007",
+      deweyDecimal: "823.92",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Mystery", "Fiction"],
+    },
+    {
+      title: "The Midnight Library",
+      author: "Matt Haig",
+      isbn: "9780525559474",
+      publishedYear: 2020,
+      publisher: "Viking",
+      language: "English",
+      pageCount: 288,
+      description:
+        "A philosophical novel about a library that exists between life and death, where each book represents a different life path.",
+      totalCopies: 3,
+      availableCopies: 3,
+      location: "A-013",
+      deweyDecimal: "823.92",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Fiction"],
+    },
+    {
+      title: "Klara and the Sun",
+      author: "Kazuo Ishiguro",
+      isbn: "9780593318171",
+      publishedYear: 2021,
+      publisher: "Knopf",
+      language: "English",
+      pageCount: 303,
+      description:
+        "A science fiction novel told from the perspective of Klara, an artificial friend designed to prevent loneliness.",
+      totalCopies: 2,
+      availableCopies: 2,
+      location: "B-006",
+      deweyDecimal: "823.914",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Science Fiction", "Fiction"],
+    },
+    {
+      title: "The Guest List",
+      author: "Lucy Foley",
+      isbn: "9780062868930",
+      publishedYear: 2020,
+      publisher: "William Morrow",
+      language: "English",
+      pageCount: 320,
+      description:
+        "A psychological thriller set at a wedding on a remote island where secrets from the past threaten to destroy lives.",
+      totalCopies: 2,
+      availableCopies: 1,
+      location: "C-008",
+      deweyDecimal: "823.92",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Mystery", "Fiction"],
+    },
+    {
+      title: "Normal People",
+      author: "Sally Rooney",
+      isbn: "9781984822178",
+      publishedYear: 2018,
+      publisher: "Hogarth",
+      language: "English",
+      pageCount: 266,
+      description:
+        "A novel following the complex relationship between two Irish teenagers, Connell and Marianne, from high school to university.",
+      totalCopies: 3,
+      availableCopies: 2,
+      location: "A-014",
+      deweyDecimal: "823.92",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Fiction"],
+    },
+    {
+      title: "The Silent Patient",
+      author: "Alex Michaelides",
+      isbn: "9781250301697",
+      publishedYear: 2019,
+      publisher: "Celadon Books",
+      language: "English",
+      pageCount: 336,
+      description:
+        "A psychological thriller about a woman who refuses to speak after allegedly murdering her husband and the therapist determined to treat her.",
+      totalCopies: 3,
+      availableCopies: 2,
+      location: "C-009",
+      deweyDecimal: "823.92",
+      format: "PHYSICAL" as const,
+      condition: "NEW" as const,
+      genres: ["Mystery", "Fiction"],
+    },
   ];
 
   // Create books and associate with genres
   const createdBooks = [];
   for (const bookData of booksData) {
     const { genres: bookGenres, ...bookInfo } = bookData;
-    
+
     const book = await prisma.book.upsert({
       where: { isbn: bookInfo.isbn },
       update: {},
       create: bookInfo,
     });
-    
+
     createdBooks.push(book);
 
     // Associate book with genres
@@ -397,22 +980,24 @@ async function main() {
   // Create about 50 random reviews
   console.log("Creating random reviews...");
   const reviewsToCreate = 50;
-  
+
   for (let i = 0; i < reviewsToCreate; i++) {
     // Pick random user and book
     const randomUser = users[Math.floor(Math.random() * users.length)];
-    const randomBook = createdBooks[Math.floor(Math.random() * createdBooks.length)];
-    
+    const randomBook =
+      createdBooks[Math.floor(Math.random() * createdBooks.length)];
+
     // Generate rating (weighted towards higher ratings like real reviews)
     const weightedRatings = [1, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5];
-    const rating = weightedRatings[Math.floor(Math.random() * weightedRatings.length)];
-    
+    const rating =
+      weightedRatings[Math.floor(Math.random() * weightedRatings.length)];
+
     // Randomly decide if review has a comment (70% chance)
     const hasComment = Math.random() > 0.3;
-    const comment = hasComment 
-      ? reviewComments[Math.floor(Math.random() * reviewComments.length)] 
+    const comment = hasComment
+      ? reviewComments[Math.floor(Math.random() * reviewComments.length)]
       : null;
-    
+
     try {
       await prisma.review.upsert({
         where: {
@@ -427,7 +1012,9 @@ async function main() {
           bookId: randomBook.id,
           rating: rating,
           comment: comment,
-          createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000), // Random date within last 30 days
+          createdAt: new Date(
+            Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
+          ), // Random date within last 30 days
         },
       });
     } catch (error) {
