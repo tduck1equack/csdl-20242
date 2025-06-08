@@ -187,48 +187,50 @@ export default function BookDetailPage() {
               <Flex direction="column" gap="3">
                 <div>
                   <Text size="1" color="gray">
-                    Availability
-                  </Text>
-                  <Badge
-                    color={book.availableCopies > 0 ? "green" : "red"}
-                    size="2"
-                  >
-                    {book.availableCopies > 0 ? "Available" : "Not Available"}
-                  </Badge>
-                </div>
-
-                <div>
-                  <Text size="1" color="gray">
-                    Copies
-                  </Text>
-                  <Text size="2" weight="medium">
-                    {book.availableCopies}/{book.totalCopies}
+                    Availability{" "}
+                    <Badge
+                      color={book.availableCopies > 0 ? "green" : "red"}
+                      size="2"
+                    >
+                      {book.availableCopies > 0 ? "Available" : "Not Available"}
+                    </Badge>
                   </Text>
                 </div>
 
                 <div>
                   <Text size="1" color="gray">
-                    Format
+                    Copies:{" "}
+                    <Text size="2" weight="medium">
+                      {book.availableCopies}/{book.totalCopies}
+                    </Text>
                   </Text>
-                  <Badge variant="outline">{book.format}</Badge>
                 </div>
 
                 <div>
                   <Text size="1" color="gray">
-                    Condition
+                    Format{" "}
+                    <Badge color="blue" variant="outline">
+                      {book.format}
+                    </Badge>
                   </Text>
-                  <Badge
-                    color={
-                      book.condition === "NEW"
-                        ? "green"
-                        : book.condition === "GOOD"
-                        ? "blue"
-                        : "orange"
-                    }
-                    variant="soft"
-                  >
-                    {book.condition}
-                  </Badge>
+                </div>
+
+                <div>
+                  <Text size="1" color="gray">
+                    Condition{" "}
+                    <Badge
+                      color={
+                        book.condition === "NEW"
+                          ? "green"
+                          : book.condition === "GOOD"
+                          ? "blue"
+                          : "orange"
+                      }
+                      variant="soft"
+                    >
+                      {book.condition}
+                    </Badge>
+                  </Text>
                 </div>
 
                 <Button
@@ -264,7 +266,8 @@ export default function BookDetailPage() {
                         {renderStars(book.averageRating)}
                       </div>
                       <Text size="2" color="gray">
-                        {book.averageRating} ({book.totalReviews} reviews)
+                        {book.averageRating} ({book.totalReviews} review
+                        {book.totalReviews > 1 ? "s" : ""})
                       </Text>
                     </Flex>
                   )}
@@ -306,52 +309,47 @@ export default function BookDetailPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Text size="1" color="gray">
-                        ISBN
+                        ISBN: <Text size="2">{book.isbn}</Text>
                       </Text>
-                      <Text size="2">{book.isbn}</Text>
                     </div>
                     <div>
                       <Text size="1" color="gray">
-                        Published Year
+                        Published Year:{" "}
+                        <Text size="2">{book.publishedYear}</Text>
                       </Text>
-                      <Text size="2">{book.publishedYear}</Text>
                     </div>
                     {book.publisher && (
                       <div>
                         <Text size="1" color="gray">
-                          Publisher
+                          Publisher: <Text size="2">{book.publisher}</Text>
                         </Text>
-                        <Text size="2">{book.publisher}</Text>
                       </div>
                     )}
                     <div>
                       <Text size="1" color="gray">
-                        Language
+                        Language: <Text size="2">{book.language}</Text>
                       </Text>
-                      <Text size="2">{book.language}</Text>
                     </div>
                     {book.pageCount && (
                       <div>
                         <Text size="1" color="gray">
-                          Pages
+                          Pages: <Text size="2">{book.pageCount}</Text>
                         </Text>
-                        <Text size="2">{book.pageCount}</Text>
                       </div>
                     )}
                     {book.location && (
                       <div>
                         <Text size="1" color="gray">
-                          Location
+                          Location: <Text size="2">{book.location}</Text>
                         </Text>
-                        <Text size="2">{book.location}</Text>
                       </div>
                     )}
                     {book.deweyDecimal && (
                       <div>
                         <Text size="1" color="gray">
-                          Dewey Decimal
+                          Dewey Decimal:{" "}
+                          <Text size="2">{book.deweyDecimal}</Text>
                         </Text>
-                        <Text size="2">{book.deweyDecimal}</Text>
                       </div>
                     )}
                   </div>
@@ -400,7 +398,8 @@ export default function BookDetailPage() {
                     <Separator />
                     <div>
                       <Text size="3" weight="medium" className="mb-4 block">
-                        Reviews ({book.totalReviews})
+                        Review{book.totalReviews > 1 ? "s" : ""} (
+                        {book.totalReviews})
                       </Text>
                       <div className="space-y-4">
                         {book.reviews.slice(0, 5).map((review) => (

@@ -5,6 +5,7 @@ import { Box, Card, Flex, Text, Heading, Badge } from "@radix-ui/themes";
 import axios from "axios";
 
 import Link from "next/link";
+import Image from "next/image";
 
 interface Book {
   id: string;
@@ -81,6 +82,13 @@ export default function BooksPage() {
                     <Heading size="4" className="mb-2 line-clamp-2">
                       {book.title}
                     </Heading>
+                    <Image
+                      src={`https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`}
+                      alt={`${book.title} cover`}
+                      width={"200"}
+                      height={"100"}
+                      className="object-cover"
+                    />
                     <Text size="2" color="gray" className="mb-2">
                       by {book.author}
                     </Text>
