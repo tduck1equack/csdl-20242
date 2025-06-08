@@ -17,6 +17,7 @@ import {
   Table,
   Avatar,
   IconButton,
+  Heading,
 } from "@radix-ui/themes";
 import {
   MagnifyingGlassIcon,
@@ -725,12 +726,12 @@ export default function AdminDashboard() {
           <Tabs.Content value="system" className="mt-6">
             <Card>
               <Box className="p-6">
-                <Text size="4" weight="bold" className="mb-4">
+                <Heading size="4" weight="bold" className="mb-4">
                   System Settings
-                </Text>
+                </Heading>
                 <Text color="gray">
                   System settings and configuration options will be implemented
-                  here.
+                  here, maybe when the system gets large enough. 🤔
                 </Text>
               </Box>
             </Card>
