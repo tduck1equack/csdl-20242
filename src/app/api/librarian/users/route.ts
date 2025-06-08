@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || "";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
+    const includeBorrowings = searchParams.get("includeBorrowings") === "true";
 
     const skip = (page - 1) * limit;
 
@@ -55,6 +56,28 @@ export async function GET(request: NextRequest) {
               },
             },
           },
+          ...(includeBorrowings && {
+            borrowings: {
+              where: {
+                status: "BORROWED",
+              },
+              select: {
+                id: true,
+                dueDate: true,
+                status: true,
+                book: {
+                  select: {
+                    id: true,
+                    title: true,
+                    author: true,
+                  },
+                },
+              },
+              orderBy: {
+                dueDate: "asc",
+              },
+            },
+          }),
         },
         orderBy: {
           name: "asc",

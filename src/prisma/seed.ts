@@ -1032,7 +1032,7 @@ async function main() {
           ), // Random date within last 30 days
         },
       });
-    } catch (error) {
+    } catch {
       // Skip if user already reviewed this book (unique constraint)
       continue;
     }
@@ -1040,7 +1040,7 @@ async function main() {
 
   console.log("Created random reviews");
 
-  // Create some sample borrowings (current)
+  // Create some sample borrowings (current) - expanded to ~20 borrowings
   const sampleBorrowings = [
     {
       userEmail: "user@library.com", // John Doe
@@ -1051,6 +1051,96 @@ async function main() {
       userEmail: "librarian@library.com", // Jane Smith
       bookTitle: "The Hitchhiker's Guide to the Galaxy",
       dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // Due in 14 days
+    },
+    {
+      userEmail: "alice.johnson@email.com",
+      bookTitle: "To Kill a Mockingbird",
+      dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // Due in 5 days
+    },
+    {
+      userEmail: "bob.wilson@email.com",
+      bookTitle: "1984",
+      dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // Due in 10 days
+    },
+    {
+      userEmail: "carol.brown@email.com",
+      bookTitle: "The Great Gatsby",
+      dueDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000), // Due in 8 days
+    },
+    {
+      userEmail: "david.taylor@email.com",
+      bookTitle: "Dune",
+      dueDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000), // Due in 12 days
+    },
+    {
+      userEmail: "emma.davis@email.com",
+      bookTitle: "Pride and Prejudice",
+      dueDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000), // Due in 6 days
+    },
+    {
+      userEmail: "frank.miller@email.com",
+      bookTitle: "The Catcher in the Rye",
+      dueDate: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000), // Due in 9 days
+    },
+    {
+      userEmail: "grace.lee@email.com",
+      bookTitle: "Harry Potter and the Philosopher's Stone",
+      dueDate: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000), // Due in 11 days
+    },
+    {
+      userEmail: "henry.garcia@email.com",
+      bookTitle: "The Lord of the Rings: The Fellowship of the Ring",
+      dueDate: new Date(Date.now() + 13 * 24 * 60 * 60 * 1000), // Due in 13 days
+    },
+    {
+      userEmail: "isabel.martinez@email.com",
+      bookTitle: "The Girl with the Dragon Tattoo",
+      dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // Overdue by 2 days
+    },
+    {
+      userEmail: "alice.johnson@email.com",
+      bookTitle: "The Hobbit",
+      dueDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // Due in 4 days
+    },
+    {
+      userEmail: "bob.wilson@email.com",
+      bookTitle: "Sapiens: A Brief History of Humankind",
+      dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // Due in 15 days
+    },
+    {
+      userEmail: "carol.brown@email.com",
+      bookTitle: "The Kite Runner",
+      dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // Overdue by 1 day
+    },
+    {
+      userEmail: "david.taylor@email.com",
+      bookTitle: "Life of Pi",
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Due in 7 days
+    },
+    {
+      userEmail: "emma.davis@email.com",
+      bookTitle: "The Fault in Our Stars",
+      dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // Due in 3 days
+    },
+    {
+      userEmail: "frank.miller@email.com",
+      bookTitle: "Gone Girl",
+      dueDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // Overdue by 3 days
+    },
+    {
+      userEmail: "grace.lee@email.com",
+      bookTitle: "The Book Thief",
+      dueDate: new Date(Date.now() + 16 * 24 * 60 * 60 * 1000), // Due in 16 days
+    },
+    {
+      userEmail: "henry.garcia@email.com",
+      bookTitle: "The Martian",
+      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Due in 2 days
+    },
+    {
+      userEmail: "isabel.martinez@email.com",
+      bookTitle: "Where the Crawdads Sing",
+      dueDate: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000), // Due in 18 days
     },
   ];
 

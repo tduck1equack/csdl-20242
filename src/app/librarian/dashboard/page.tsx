@@ -21,8 +21,6 @@ import {
 import {
   MagnifyingGlassIcon,
   PlusIcon,
-  Pencil1Icon,
-  TrashIcon,
   CheckIcon,
   Cross2Icon,
 } from "@radix-ui/react-icons";
@@ -121,6 +119,23 @@ interface User {
   };
 }
 
+interface UserWithBorrowings {
+  id: string;
+  name: string;
+  email: string;
+  membershipStatus: string;
+  borrowings: {
+    id: string;
+    dueDate: string;
+    status: string;
+    book: {
+      id: string;
+      title: string;
+      author: string;
+    };
+  }[];
+}
+
 interface Notification {
   id: string;
   title: string;
@@ -148,11 +163,21 @@ export default function LibrarianDashboard() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
 
+  // Enhanced user selection states
+  const [borrowingUsers, setBorrowingUsers] = useState<UserWithBorrowings[]>(
+    []
+  );
+  const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
+  const [selectedBorrowing, setSelectedBorrowing] = useState<string>("");
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
   // Dialog states
   const [showCreateNotification, setShowCreateNotification] = useState(false);
   const [showCreateFine, setShowCreateFine] = useState(false);
   const [showActionDialog, setShowActionDialog] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<Borrowing | Fine | null>(
+    null
+  );
   const [actionType, setActionType] = useState("");
 
   // Form states
@@ -190,6 +215,7 @@ export default function LibrarianDashboard() {
     } else if (activeTab === "notifications") {
       fetchNotifications();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, searchTerm, filterStatus, showOverdueOnly]);
 
   const fetchDashboardData = async () => {
@@ -274,7 +300,45 @@ export default function LibrarianDashboard() {
     }
   };
 
+  const fetchBorrowingUsers = async () => {
+    setLoadingUsers(true);
+    console.log(
+      "🔍 fetchBorrowingUsers: Starting to fetch users with borrowings"
+    );
+    try {
+      const response = await fetch(
+        "/api/librarian/users?includeBorrowings=true"
+      );
+      console.log("🔍 fetchBorrowingUsers: Response status:", response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("🔍 fetchBorrowingUsers: Raw API response:", data);
+
+        const usersWithBorrowings = data.users.filter(
+          (user: UserWithBorrowings) => user.borrowings.length > 0
+        );
+        console.log(
+          "🔍 fetchBorrowingUsers: Filtered users with borrowings:",
+          usersWithBorrowings
+        );
+
+        setBorrowingUsers(usersWithBorrowings);
+      } else {
+        console.error(
+          "🔍 fetchBorrowingUsers: Response not ok:",
+          response.statusText
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching borrowing users:", error);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
   const handleBorrowingAction = async () => {
+    if (!selectedItem) return;
+
     try {
       const response = await fetch(
         `/api/librarian/borrowings/${selectedItem.id}`,
@@ -305,6 +369,8 @@ export default function LibrarianDashboard() {
   };
 
   const handleFineAction = async () => {
+    if (!selectedItem) return;
+
     try {
       const response = await fetch(`/api/librarian/fines/${selectedItem.id}`, {
         method: "PUT",
@@ -385,23 +451,25 @@ export default function LibrarianDashboard() {
       return <Badge color="red">Overdue</Badge>;
     }
 
-    const statusColors: Record<string, any> = {
-      BORROWED: "blue",
-      RETURNED: "green",
-      OVERDUE: "red",
-      LOST: "orange",
-      DAMAGED: "yellow",
-      UNPAID: "red",
-      PAID: "green",
-      WAIVED: "gray",
-      PENDING: "yellow",
-      READY: "blue",
-      CLAIMED: "green",
-      EXPIRED: "red",
-      CANCELLED: "gray",
+    const statusColorMap = {
+      BORROWED: "blue" as const,
+      RETURNED: "green" as const,
+      OVERDUE: "red" as const,
+      LOST: "orange" as const,
+      DAMAGED: "yellow" as const,
+      UNPAID: "red" as const,
+      PAID: "green" as const,
+      WAIVED: "gray" as const,
+      PENDING: "yellow" as const,
+      READY: "blue" as const,
+      CLAIMED: "green" as const,
+      EXPIRED: "red" as const,
+      CANCELLED: "gray" as const,
     };
 
-    return <Badge color={statusColors[status] || "gray"}>{status}</Badge>;
+    const color =
+      statusColorMap[status as keyof typeof statusColorMap] || "gray";
+    return <Badge color={color}>{status}</Badge>;
   };
 
   if (loading) {
@@ -958,14 +1026,54 @@ export default function LibrarianDashboard() {
         {/* Create Notification Dialog */}
         <Dialog.Root
           open={showCreateNotification}
-          onOpenChange={setShowCreateNotification}
+          onOpenChange={(open) => {
+            setShowCreateNotification(open);
+            if (open) fetchBorrowingUsers();
+          }}
         >
-          <Dialog.Content maxWidth="450px">
+          <Dialog.Content maxWidth="600px">
             <Dialog.Title>Send Notification</Dialog.Title>
             <Flex direction="column" gap="3">
               <label>
                 <Text as="div" size="2" mb="1" weight="bold">
-                  User ID
+                  Select User
+                </Text>
+                {loadingUsers ? (
+                  <Text>Loading users...</Text>
+                ) : (
+                  <Box className="max-h-48 overflow-y-auto border rounded p-2">
+                    {borrowingUsers.map((user) => (
+                      <Flex
+                        key={user.id}
+                        align="center"
+                        gap="2"
+                        className="p-2 hover:bg-gray-100 rounded cursor-pointer"
+                        onClick={() =>
+                          setNotificationForm({
+                            ...notificationForm,
+                            userId: user.id,
+                          })
+                        }
+                      >
+                        <input
+                          type="radio"
+                          checked={notificationForm.userId === user.id}
+                          onChange={() => {}}
+                        />
+                        <Avatar size="1" fallback={user.name.charAt(0)} />
+                        <Flex direction="column">
+                          <Text weight="bold">{user.name}</Text>
+                          <Text size="1" color="gray">
+                            {user.email} • {user.borrowings.length} active
+                            borrowings
+                          </Text>
+                        </Flex>
+                      </Flex>
+                    ))}
+                  </Box>
+                )}
+                <Text as="div" size="1" color="gray" mt="1">
+                  Or enter User ID manually:
                 </Text>
                 <TextField.Root
                   placeholder="Enter user ID"
@@ -1067,13 +1175,101 @@ export default function LibrarianDashboard() {
         </Dialog.Root>
 
         {/* Create Fine Dialog */}
-        <Dialog.Root open={showCreateFine} onOpenChange={setShowCreateFine}>
-          <Dialog.Content maxWidth="450px">
+        <Dialog.Root
+          open={showCreateFine}
+          onOpenChange={(open) => {
+            setShowCreateFine(open);
+            if (open) fetchBorrowingUsers();
+          }}
+        >
+          <Dialog.Content maxWidth="700px">
             <Dialog.Title>Create Fine</Dialog.Title>
             <Flex direction="column" gap="3">
               <label>
                 <Text as="div" size="2" mb="1" weight="bold">
-                  Borrowing ID
+                  Select Borrowing
+                </Text>
+                {loadingUsers ? (
+                  <Text>Loading users and borrowings...</Text>
+                ) : (
+                  <Box className="max-h-64 overflow-y-auto border rounded p-2">
+                    {borrowingUsers.map((user) => (
+                      <Box key={user.id} className="mb-2">
+                        <Flex
+                          align="center"
+                          gap="2"
+                          className="p-2 hover:bg-gray-50 rounded cursor-pointer"
+                          onClick={() => {
+                            const newExpanded = new Set(expandedUsers);
+                            if (expandedUsers.has(user.id)) {
+                              newExpanded.delete(user.id);
+                            } else {
+                              newExpanded.add(user.id);
+                            }
+                            setExpandedUsers(newExpanded);
+                          }}
+                        >
+                          <Text>{expandedUsers.has(user.id) ? "▼" : "▶"}</Text>
+                          <Avatar size="1" fallback={user.name.charAt(0)} />
+                          <Flex direction="column">
+                            <Text weight="bold">{user.name}</Text>
+                            <Text size="1" color="gray">
+                              {user.email} • {user.borrowings.length} active
+                              borrowings
+                            </Text>
+                          </Flex>
+                        </Flex>
+                        {expandedUsers.has(user.id) && (
+                          <Box className="ml-6 mt-2">
+                            {user.borrowings.map((borrowing) => (
+                              <Flex
+                                key={borrowing.id}
+                                align="center"
+                                gap="2"
+                                className="p-2 hover:bg-blue-50 rounded cursor-pointer"
+                                onClick={() => {
+                                  setFineForm({
+                                    ...fineForm,
+                                    borrowingId: borrowing.id,
+                                  });
+                                  setSelectedBorrowing(borrowing.id);
+                                }}
+                              >
+                                <input
+                                  type="radio"
+                                  checked={selectedBorrowing === borrowing.id}
+                                  onChange={() => {}}
+                                />
+                                <Flex direction="column" className="flex-1">
+                                  <Text weight="bold">
+                                    {borrowing.book.title}
+                                  </Text>
+                                  <Text size="1" color="gray">
+                                    by {borrowing.book.author} • Due:{" "}
+                                    {new Date(
+                                      borrowing.dueDate
+                                    ).toLocaleDateString()}
+                                  </Text>
+                                  <Badge
+                                    color={
+                                      borrowing.status === "BORROWED"
+                                        ? "blue"
+                                        : "gray"
+                                    }
+                                  >
+                                    {borrowing.status}
+                                  </Badge>
+                                </Flex>
+                              </Flex>
+                            ))}
+                          </Box>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+                <Text as="div" size="1" color="gray" mt="1">
+                  Or enter Borrowing ID manually:
                 </Text>
                 <TextField.Root
                   placeholder="Enter borrowing ID"
@@ -1191,7 +1387,7 @@ export default function LibrarianDashboard() {
               </Dialog.Close>
               <Button
                 onClick={
-                  selectedItem?.amount !== undefined
+                  selectedItem && "amount" in selectedItem
                     ? handleFineAction
                     : handleBorrowingAction
                 }
