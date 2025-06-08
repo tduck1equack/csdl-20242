@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { Pencil1Icon } from "@radix-ui/react-icons";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Genre {
@@ -87,12 +88,6 @@ export default function BookDetailPage() {
   const { user } = useAuth();
   const bookId = params.id as string;
 
-  useEffect(() => {
-    if (bookId) {
-      fetchBook();
-    }
-  }, [bookId]);
-
   const fetchBook = useCallback(async () => {
     try {
       const response = await axios.get(`/api/books/${bookId}`);
@@ -104,6 +99,12 @@ export default function BookDetailPage() {
       setIsLoading(false);
     }
   }, [bookId]);
+
+  useEffect(() => {
+    if (bookId) {
+      fetchBook();
+    }
+  }, [bookId, fetchBook]);
 
   const handleBorrowBook = async () => {
     if (!user || !book) return;
@@ -301,6 +302,14 @@ export default function BookDetailPage() {
                 <Flex direction="column" gap="2">
                   {user ? (
                     <>
+                      {(user.role === "LIBRARIAN" || user.role === "ADMIN") && (
+                        <Link href={`/librarian/books/${book.id}`}>
+                          <Button size="3" variant="outline" className="w-full">
+                            <Pencil1Icon />
+                            Edit Book
+                          </Button>
+                        </Link>
+                      )}
                       <Button
                         size="3"
                         disabled={book.availableCopies === 0 || borrowLoading}
