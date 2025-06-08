@@ -565,7 +565,12 @@ export default function LibrarianDashboard() {
                   Quick Actions
                 </Text>
                 <Flex gap="3">
-                  <Button onClick={() => setShowCreateNotification(true)}>
+                  <Button
+                    onClick={() => {
+                      setShowCreateNotification(true);
+                      fetchBorrowingUsers();
+                    }}
+                  >
                     <PlusIcon />
                     Send Notification
                   </Button>
