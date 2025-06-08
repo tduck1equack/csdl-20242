@@ -27,7 +27,7 @@ if [ ! -f .env ]; then
     echo "📝 Creating .env file..."
     cat > .env << EOF
 # Database
-DATABASE_URL="postgresql://postgres:password@localhost:5432/library_db?schema=public"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/library_management?schema=public"
 
 # JWT Secret (change this in production)
 JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
