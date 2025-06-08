@@ -227,6 +227,8 @@ exports.Prisma.NotificationScalarFieldEnum = {
   message: 'message',
   type: 'type',
   isRead: 'isRead',
+  actionUrl: 'actionUrl',
+  metadata: 'metadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -296,8 +298,14 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   DUE_DATE_REMINDER: 'DUE_DATE_REMINDER',
   OVERDUE_NOTICE: 'OVERDUE_NOTICE',
   RESERVATION_READY: 'RESERVATION_READY',
+  RESERVATION_EXPIRED: 'RESERVATION_EXPIRED',
   FINE_ISSUED: 'FINE_ISSUED',
-  GENERAL: 'GENERAL'
+  FINE_REMINDER: 'FINE_REMINDER',
+  BOOK_RETURNED: 'BOOK_RETURNED',
+  RENEWAL_SUCCESS: 'RENEWAL_SUCCESS',
+  RENEWAL_FAILED: 'RENEWAL_FAILED',
+  GENERAL: 'GENERAL',
+  SYSTEM_MAINTENANCE: 'SYSTEM_MAINTENANCE'
 };
 
 exports.Prisma.ModelName = {

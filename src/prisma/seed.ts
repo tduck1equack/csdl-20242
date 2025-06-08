@@ -6,6 +6,21 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Starting seed...");
 
+  // Clear existing data in the correct order (respecting foreign key constraints)
+  console.log("Clearing existing data...");
+
+  await prisma.notification.deleteMany({});
+  await prisma.fine.deleteMany({});
+  await prisma.review.deleteMany({});
+  await prisma.reservation.deleteMany({});
+  await prisma.borrowing.deleteMany({});
+  await prisma.bookGenre.deleteMany({});
+  await prisma.book.deleteMany({});
+  await prisma.genre.deleteMany({});
+  await prisma.user.deleteMany({});
+
+  console.log("Existing data cleared successfully!");
+
   // Create demo users
   const hashedPassword = await bcrypt.hash("password123", 10);
 
@@ -1068,6 +1083,109 @@ async function main() {
   }
 
   console.log("Created sample borrowings");
+
+  // Create sample notifications
+  console.log("Creating sample notifications...");
+
+  const sampleNotifications = [
+    {
+      userEmail: "user@library.com",
+      title: "Book Due Soon",
+      message:
+        "Your book 'The Murder of Roger Ackroyd' is due in 3 days. Please return or renew it.",
+      type: "DUE_DATE_REMINDER" as const,
+      actionUrl: "/dashboard/borrowings",
+    },
+    {
+      userEmail: "user@library.com",
+      title: "Welcome to the Library!",
+      message:
+        "Welcome to our digital library system. You can browse books, make reservations, and manage your borrowings from your dashboard.",
+      type: "GENERAL" as const,
+      actionUrl: "/books",
+    },
+    {
+      userEmail: "librarian@library.com",
+      title: "Renewal Successful",
+      message:
+        "Your book 'The Hitchhiker's Guide to the Galaxy' has been successfully renewed. New due date: " +
+        new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+      type: "RENEWAL_SUCCESS" as const,
+      actionUrl: "/dashboard/borrowings",
+    },
+    {
+      userEmail: "alice.johnson@email.com",
+      title: "Fine Issued",
+      message:
+        "A late return fine of $2.50 has been issued for 'To Kill a Mockingbird'. Please pay at the circulation desk.",
+      type: "FINE_ISSUED" as const,
+      actionUrl: "/dashboard/fines",
+    },
+    {
+      userEmail: "bob.wilson@email.com",
+      title: "System Maintenance Notice",
+      message:
+        "The library system will undergo maintenance this Sunday from 2 AM to 6 AM. Online services may be temporarily unavailable.",
+      type: "SYSTEM_MAINTENANCE" as const,
+    },
+  ];
+
+  for (const notificationData of sampleNotifications) {
+    const user = users.find((u) => u.email === notificationData.userEmail);
+
+    if (user) {
+      await prisma.notification.create({
+        data: {
+          userId: user.id,
+          title: notificationData.title,
+          message: notificationData.message,
+          type: notificationData.type,
+          actionUrl: notificationData.actionUrl,
+        },
+      });
+    }
+  }
+
+  console.log("Created sample notifications");
+
+  // Create some sample reservations
+  console.log("Creating sample reservations...");
+
+  const sampleReservations = [
+    {
+      userEmail: "alice.johnson@email.com",
+      bookTitle: "Dune",
+      status: "PENDING" as const,
+    },
+    {
+      userEmail: "bob.wilson@email.com",
+      bookTitle: "Harry Potter and the Philosopher's Stone",
+      status: "READY" as const,
+    },
+  ];
+
+  for (const reservationData of sampleReservations) {
+    const user = users.find((u) => u.email === reservationData.userEmail);
+    const book = await prisma.book.findFirst({
+      where: { title: reservationData.bookTitle },
+    });
+
+    if (book && user) {
+      await prisma.reservation.create({
+        data: {
+          userId: user.id,
+          bookId: book.id,
+          status: reservationData.status,
+          expiryDate:
+            reservationData.status === "READY"
+              ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+              : null, // 3 days to claim if ready
+        },
+      });
+    }
+  }
+
+  console.log("Created sample reservations");
   console.log("Seed completed successfully!");
 }
 

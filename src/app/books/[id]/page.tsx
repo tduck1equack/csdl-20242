@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import { useParams } from "next/navigation";
 import {
   Box,
   Card,
@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Genre {
   id: string;
@@ -79,9 +80,11 @@ export default function BookDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [imageError, setImageError] = useState(false);
+  const [borrowLoading, setBorrowLoading] = useState(false);
+  const [reserveLoading, setReserveLoading] = useState(false);
 
   const params = useParams();
-  const router = useRouter();
+  const { user } = useAuth();
   const bookId = params.id as string;
 
   useEffect(() => {
@@ -90,7 +93,7 @@ export default function BookDetailPage() {
     }
   }, [bookId]);
 
-  const fetchBook = async () => {
+  const fetchBook = useCallback(async () => {
     try {
       const response = await axios.get(`/api/books/${bookId}`);
       setBook(response.data);
@@ -99,6 +102,68 @@ export default function BookDetailPage() {
       setError("Failed to load book details");
     } finally {
       setIsLoading(false);
+    }
+  }, [bookId]);
+
+  const handleBorrowBook = async () => {
+    if (!user || !book) return;
+
+    try {
+      setBorrowLoading(true);
+      const response = await fetch("/api/dashboard/borrowings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          bookId: book.id,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Book borrowed successfully!");
+        fetchBook(); // Refresh book data
+      } else {
+        const error = await response.json();
+        alert(error.error || "Failed to borrow book");
+      }
+    } catch (error) {
+      console.error("Error borrowing book:", error);
+      alert("Failed to borrow book");
+    } finally {
+      setBorrowLoading(false);
+    }
+  };
+
+  const handleReserveBook = async () => {
+    if (!user || !book) return;
+
+    try {
+      setReserveLoading(true);
+      const response = await fetch("/api/dashboard/reservations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          bookId: book.id,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Book reserved successfully!");
+        fetchBook(); // Refresh book data
+      } else {
+        const error = await response.json();
+        alert(error.error || "Failed to reserve book");
+      }
+    } catch (error) {
+      console.error("Error reserving book:", error);
+      alert("Failed to reserve book");
+    } finally {
+      setReserveLoading(false);
     }
   };
 
@@ -233,13 +298,41 @@ export default function BookDetailPage() {
                   </Text>
                 </div>
 
-                <Button
-                  size="3"
-                  disabled={book.availableCopies === 0}
-                  className="w-full mt-4"
-                >
-                  {book.availableCopies > 0 ? "Borrow Book" : "Out of Stock"}
-                </Button>
+                <Flex direction="column" gap="2">
+                  {user ? (
+                    <>
+                      <Button
+                        size="3"
+                        disabled={book.availableCopies === 0 || borrowLoading}
+                        className="w-full"
+                        onClick={handleBorrowBook}
+                      >
+                        {borrowLoading
+                          ? "Borrowing..."
+                          : book.availableCopies > 0
+                          ? "Borrow Book"
+                          : "Out of Stock"}
+                      </Button>
+                      {book.availableCopies === 0 && (
+                        <Button
+                          size="3"
+                          variant="outline"
+                          disabled={reserveLoading}
+                          className="w-full"
+                          onClick={handleReserveBook}
+                        >
+                          {reserveLoading ? "Reserving..." : "Reserve Book"}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    <Link href="/login">
+                      <Button size="3" className="w-full">
+                        Login to Borrow
+                      </Button>
+                    </Link>
+                  )}
+                </Flex>
               </Flex>
             </Box>
           </Card>

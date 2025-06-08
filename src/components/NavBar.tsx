@@ -29,6 +29,11 @@ export default function NavBar() {
 
           {user ? (
             <>
+              <Link href="/dashboard">
+                <Button variant="ghost" size="2">
+                  Dashboard
+                </Button>
+              </Link>
               <Text size="2" className="text-gray-600">
                 Welcome, {user.name}
               </Text>

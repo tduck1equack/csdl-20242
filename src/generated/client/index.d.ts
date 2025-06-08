@@ -135,8 +135,14 @@ export const NotificationType: {
   DUE_DATE_REMINDER: 'DUE_DATE_REMINDER',
   OVERDUE_NOTICE: 'OVERDUE_NOTICE',
   RESERVATION_READY: 'RESERVATION_READY',
+  RESERVATION_EXPIRED: 'RESERVATION_EXPIRED',
   FINE_ISSUED: 'FINE_ISSUED',
-  GENERAL: 'GENERAL'
+  FINE_REMINDER: 'FINE_REMINDER',
+  BOOK_RETURNED: 'BOOK_RETURNED',
+  RENEWAL_SUCCESS: 'RENEWAL_SUCCESS',
+  RENEWAL_FAILED: 'RENEWAL_FAILED',
+  GENERAL: 'GENERAL',
+  SYSTEM_MAINTENANCE: 'SYSTEM_MAINTENANCE'
 };
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
@@ -11260,6 +11266,8 @@ export namespace Prisma {
     message: string | null
     type: $Enums.NotificationType | null
     isRead: boolean | null
+    actionUrl: string | null
+    metadata: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -11271,6 +11279,8 @@ export namespace Prisma {
     message: string | null
     type: $Enums.NotificationType | null
     isRead: boolean | null
+    actionUrl: string | null
+    metadata: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -11282,6 +11292,8 @@ export namespace Prisma {
     message: number
     type: number
     isRead: number
+    actionUrl: number
+    metadata: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -11295,6 +11307,8 @@ export namespace Prisma {
     message?: true
     type?: true
     isRead?: true
+    actionUrl?: true
+    metadata?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -11306,6 +11320,8 @@ export namespace Prisma {
     message?: true
     type?: true
     isRead?: true
+    actionUrl?: true
+    metadata?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -11317,6 +11333,8 @@ export namespace Prisma {
     message?: true
     type?: true
     isRead?: true
+    actionUrl?: true
+    metadata?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -11401,6 +11419,8 @@ export namespace Prisma {
     message: string
     type: $Enums.NotificationType
     isRead: boolean
+    actionUrl: string | null
+    metadata: string | null
     createdAt: Date
     updatedAt: Date
     _count: NotificationCountAggregateOutputType | null
@@ -11429,6 +11449,8 @@ export namespace Prisma {
     message?: boolean
     type?: boolean
     isRead?: boolean
+    actionUrl?: boolean
+    metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -11441,6 +11463,8 @@ export namespace Prisma {
     message?: boolean
     type?: boolean
     isRead?: boolean
+    actionUrl?: boolean
+    metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -11453,6 +11477,8 @@ export namespace Prisma {
     message?: boolean
     type?: boolean
     isRead?: boolean
+    actionUrl?: boolean
+    metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -11465,11 +11491,13 @@ export namespace Prisma {
     message?: boolean
     type?: boolean
     isRead?: boolean
+    actionUrl?: boolean
+    metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "message" | "type" | "isRead" | "createdAt" | "updatedAt", ExtArgs["result"]["notification"]>
+  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "message" | "type" | "isRead" | "actionUrl" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["notification"]>
   export type NotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -11492,6 +11520,8 @@ export namespace Prisma {
       message: string
       type: $Enums.NotificationType
       isRead: boolean
+      actionUrl: string | null
+      metadata: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["notification"]>
@@ -11924,6 +11954,8 @@ export namespace Prisma {
     readonly message: FieldRef<"Notification", 'String'>
     readonly type: FieldRef<"Notification", 'NotificationType'>
     readonly isRead: FieldRef<"Notification", 'Boolean'>
+    readonly actionUrl: FieldRef<"Notification", 'String'>
+    readonly metadata: FieldRef<"Notification", 'String'>
     readonly createdAt: FieldRef<"Notification", 'DateTime'>
     readonly updatedAt: FieldRef<"Notification", 'DateTime'>
   }
@@ -12485,6 +12517,8 @@ export namespace Prisma {
     message: 'message',
     type: 'type',
     isRead: 'isRead',
+    actionUrl: 'actionUrl',
+    metadata: 'metadata',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -13378,6 +13412,8 @@ export namespace Prisma {
     message?: StringFilter<"Notification"> | string
     type?: EnumNotificationTypeFilter<"Notification"> | $Enums.NotificationType
     isRead?: BoolFilter<"Notification"> | boolean
+    actionUrl?: StringNullableFilter<"Notification"> | string | null
+    metadata?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     updatedAt?: DateTimeFilter<"Notification"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -13390,6 +13426,8 @@ export namespace Prisma {
     message?: SortOrder
     type?: SortOrder
     isRead?: SortOrder
+    actionUrl?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -13405,6 +13443,8 @@ export namespace Prisma {
     message?: StringFilter<"Notification"> | string
     type?: EnumNotificationTypeFilter<"Notification"> | $Enums.NotificationType
     isRead?: BoolFilter<"Notification"> | boolean
+    actionUrl?: StringNullableFilter<"Notification"> | string | null
+    metadata?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     updatedAt?: DateTimeFilter<"Notification"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -13417,6 +13457,8 @@ export namespace Prisma {
     message?: SortOrder
     type?: SortOrder
     isRead?: SortOrder
+    actionUrl?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: NotificationCountOrderByAggregateInput
@@ -13434,6 +13476,8 @@ export namespace Prisma {
     message?: StringWithAggregatesFilter<"Notification"> | string
     type?: EnumNotificationTypeWithAggregatesFilter<"Notification"> | $Enums.NotificationType
     isRead?: BoolWithAggregatesFilter<"Notification"> | boolean
+    actionUrl?: StringNullableWithAggregatesFilter<"Notification"> | string | null
+    metadata?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
   }
@@ -14178,6 +14222,8 @@ export namespace Prisma {
     message: string
     type: $Enums.NotificationType
     isRead?: boolean
+    actionUrl?: string | null
+    metadata?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutNotificationsInput
@@ -14190,6 +14236,8 @@ export namespace Prisma {
     message: string
     type: $Enums.NotificationType
     isRead?: boolean
+    actionUrl?: string | null
+    metadata?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14200,6 +14248,8 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
@@ -14212,6 +14262,8 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14223,6 +14275,8 @@ export namespace Prisma {
     message: string
     type: $Enums.NotificationType
     isRead?: boolean
+    actionUrl?: string | null
+    metadata?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14233,6 +14287,8 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14244,6 +14300,8 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15029,6 +15087,8 @@ export namespace Prisma {
     message?: SortOrder
     type?: SortOrder
     isRead?: SortOrder
+    actionUrl?: SortOrder
+    metadata?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15040,6 +15100,8 @@ export namespace Prisma {
     message?: SortOrder
     type?: SortOrder
     isRead?: SortOrder
+    actionUrl?: SortOrder
+    metadata?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15051,6 +15113,8 @@ export namespace Prisma {
     message?: SortOrder
     type?: SortOrder
     isRead?: SortOrder
+    actionUrl?: SortOrder
+    metadata?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16238,6 +16302,8 @@ export namespace Prisma {
     message: string
     type: $Enums.NotificationType
     isRead?: boolean
+    actionUrl?: string | null
+    metadata?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -16248,6 +16314,8 @@ export namespace Prisma {
     message: string
     type: $Enums.NotificationType
     isRead?: boolean
+    actionUrl?: string | null
+    metadata?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -16413,6 +16481,8 @@ export namespace Prisma {
     message?: StringFilter<"Notification"> | string
     type?: EnumNotificationTypeFilter<"Notification"> | $Enums.NotificationType
     isRead?: BoolFilter<"Notification"> | boolean
+    actionUrl?: StringNullableFilter<"Notification"> | string | null
+    metadata?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     updatedAt?: DateTimeFilter<"Notification"> | Date | string
   }
@@ -17809,6 +17879,8 @@ export namespace Prisma {
     message: string
     type: $Enums.NotificationType
     isRead?: boolean
+    actionUrl?: string | null
+    metadata?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17956,6 +18028,8 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17966,6 +18040,8 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17976,6 +18052,8 @@ export namespace Prisma {
     message?: StringFieldUpdateOperationsInput | string
     type?: EnumNotificationTypeFieldUpdateOperationsInput | $Enums.NotificationType
     isRead?: BoolFieldUpdateOperationsInput | boolean
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
