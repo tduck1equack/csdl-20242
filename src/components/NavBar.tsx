@@ -29,7 +29,15 @@ export default function NavBar() {
 
           {user ? (
             <>
-              <Link href="/dashboard">
+              <Link
+                href={
+                  user.role === "USER"
+                    ? "/dashboard"
+                    : user.role === "LIBRARIAN"
+                    ? "/librarian/dashboard"
+                    : "/admin/dashboard"
+                }
+              >
                 <Button variant="ghost" size="2">
                   Dashboard
                 </Button>
