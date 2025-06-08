@@ -51,21 +51,29 @@ export default function Home() {
                 <Link href="/books">
                   <Button size="3">Browse Books</Button>
                 </Link>
-                <Link href="/user/dashboard">
-                  <Button variant="soft" size="3">
-                    User Dashboard
-                  </Button>
-                </Link>
-                <Link href="/librarian/dashboard">
-                  <Button variant="outline" size="3">
-                    Librarian Dashboard
-                  </Button>
-                </Link>
-                <Link href="/admin/dashboard">
-                  <Button variant="outline" size="3">
-                    Admin Dashboard
-                  </Button>
-                </Link>
+                {user ? (
+                  user.role === "USER" ? (
+                    <Link href="/user/dashboard">
+                      <Button variant="soft" size="3">
+                        User Dashboard
+                      </Button>
+                    </Link>
+                  ) : user.role === "LIBRARIAN" ? (
+                    <Link href="/librarian/dashboard">
+                      <Button variant="outline" size="3">
+                        Librarian Dashboard
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/admin/dashboard">
+                      <Button variant="outline" size="3">
+                        Admin Dashboard
+                      </Button>
+                    </Link>
+                  )
+                ) : (
+                  ""
+                )}
               </div>
             </div>
           </div>
