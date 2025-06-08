@@ -378,7 +378,6 @@ export default function LibrarianDashboard() {
       if (response.ok) {
         const data = await response.json();
         setBooks(data.books);
-        console.log(data.books);
       }
     } catch (error) {
       console.error("Error fetching books:", error);
