@@ -25,6 +25,7 @@ import {
   Cross2Icon,
 } from "@radix-ui/react-icons";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useRouter } from "next/navigation";
 
 interface DashboardStats {
   borrowings: {
@@ -151,6 +152,36 @@ interface Notification {
   };
 }
 
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  isbn: string;
+  publishedYear: number;
+  publisher?: string;
+  language: string;
+  pageCount?: number;
+  description: string;
+  totalCopies: number;
+  availableCopies: number;
+  coverImage?: string;
+  location?: string;
+  format: string;
+  condition: string;
+  createdAt: string;
+  genres: {
+    id: string;
+    genre: {
+      name: string;
+    };
+  }[];
+}
+
+interface Genre {
+  id: string;
+  name: string;
+}
+
 export default function LibrarianDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -158,6 +189,8 @@ export default function LibrarianDashboard() {
   const [fines, setFines] = useState<Fine[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [genres, setGenres] = useState<Genre[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -180,6 +213,26 @@ export default function LibrarianDashboard() {
   );
   const [actionType, setActionType] = useState("");
 
+  // Book management state
+  const [showAddBookDialog, setShowAddBookDialog] = useState(false);
+  const [bookForm, setBookForm] = useState({
+    title: "",
+    author: "",
+    isbn: "",
+    publishedYear: new Date().getFullYear(),
+    publisher: "",
+    language: "English",
+    pageCount: "",
+    description: "",
+    totalCopies: 1,
+    location: "",
+    format: "PHYSICAL",
+    condition: "NEW",
+    genreIds: [] as string[],
+  });
+  const [bookSearchTerm, setBookSearchTerm] = useState("");
+  const [bookFilter, setBookFilter] = useState("all");
+
   // Form states
   const [notificationForm, setNotificationForm] = useState({
     userId: "",
@@ -200,6 +253,7 @@ export default function LibrarianDashboard() {
     fineAmount: "",
     fineReason: "",
   });
+  const router = useRouter();
 
   useEffect(() => {
     fetchDashboardData();
@@ -214,9 +268,19 @@ export default function LibrarianDashboard() {
       fetchUsers();
     } else if (activeTab === "notifications") {
       fetchNotifications();
+    } else if (activeTab === "books") {
+      fetchBooks();
+      fetchGenres();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, searchTerm, filterStatus, showOverdueOnly]);
+  }, [
+    activeTab,
+    searchTerm,
+    filterStatus,
+    showOverdueOnly,
+    bookSearchTerm,
+    bookFilter,
+  ]);
 
   const fetchDashboardData = async () => {
     try {
@@ -297,6 +361,36 @@ export default function LibrarianDashboard() {
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
+    }
+  };
+
+  const fetchBooks = async () => {
+    try {
+      const params = new URLSearchParams({
+        ...(bookSearchTerm && { search: bookSearchTerm }),
+        ...(bookFilter !== "all" && { format: bookFilter }),
+      });
+
+      const response = await fetch(`/api/librarian/books?${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        setBooks(data.books);
+        console.log(data.books);
+      }
+    } catch (error) {
+      console.error("Error fetching books:", error);
+    }
+  };
+
+  const fetchGenres = async () => {
+    try {
+      const response = await fetch("/api/genres");
+      if (response.ok) {
+        const data = await response.json();
+        setGenres(data.genres || []);
+      }
+    } catch (error) {
+      console.error("Error fetching genres:", error);
     }
   };
 
@@ -434,6 +528,43 @@ export default function LibrarianDashboard() {
     }
   };
 
+  const handleCreateBook = async () => {
+    try {
+      const response = await fetch("/api/librarian/books", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...bookForm,
+          pageCount: bookForm.pageCount ? parseInt(bookForm.pageCount) : null,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchBooks();
+        setShowAddBookDialog(false);
+        setBookForm({
+          title: "",
+          author: "",
+          isbn: "",
+          publishedYear: new Date().getFullYear(),
+          publisher: "",
+          language: "English",
+          pageCount: "",
+          description: "",
+          totalCopies: 1,
+          location: "",
+          format: "PHYSICAL",
+          condition: "NEW",
+          genreIds: [],
+        });
+      }
+    } catch (error) {
+      console.error("Error creating book:", error);
+    }
+  };
+
   const getStatusBadge = (status: string, isOverdue?: boolean) => {
     if (isOverdue) {
       return <Badge color="red">Overdue</Badge>;
@@ -483,6 +614,7 @@ export default function LibrarianDashboard() {
             <Tabs.Trigger value="borrowings">Borrowings</Tabs.Trigger>
             <Tabs.Trigger value="fines">Fines</Tabs.Trigger>
             <Tabs.Trigger value="users">Users</Tabs.Trigger>
+            <Tabs.Trigger value="books">Books</Tabs.Trigger>
             <Tabs.Trigger value="notifications">Notifications</Tabs.Trigger>
           </Tabs.List>
 
@@ -1014,6 +1146,170 @@ export default function LibrarianDashboard() {
               </Box>
             </Card>
           </Tabs.Content>
+
+          {/* Books Management Tab */}
+          <Tabs.Content value="books" className="mt-6">
+            <Card>
+              <Box className="p-6">
+                <Flex justify="between" align="center" className="mb-4">
+                  <Text size="4" weight="bold">
+                    Books Management
+                  </Text>
+                  <Flex gap="3" align="center">
+                    <Select.Root
+                      value={bookFilter}
+                      onValueChange={setBookFilter}
+                    >
+                      <Select.Trigger placeholder="Filter by format" />
+                      <Select.Content>
+                        <Select.Item value="all">All Formats</Select.Item>
+                        <Select.Item value="PHYSICAL">Physical</Select.Item>
+                        <Select.Item value="EBOOK">Ebook</Select.Item>
+                        <Select.Item value="AUDIOBOOK">Audiobook</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
+                    <TextField.Root
+                      placeholder="Search books..."
+                      value={bookSearchTerm}
+                      onChange={(e) => setBookSearchTerm(e.target.value)}
+                    >
+                      <TextField.Slot>
+                        <MagnifyingGlassIcon height="16" width="16" />
+                      </TextField.Slot>
+                    </TextField.Root>
+                    <Dialog.Root
+                      open={showAddBookDialog}
+                      onOpenChange={setShowAddBookDialog}
+                    >
+                      <Dialog.Trigger>
+                        <Button>
+                          <PlusIcon width="16" height="16" />
+                          Add Book
+                        </Button>
+                      </Dialog.Trigger>
+                    </Dialog.Root>
+                  </Flex>
+                </Flex>
+
+                {/* Books Table */}
+                <Box className="overflow-x-auto">
+                  <Table.Root>
+                    <Table.Header>
+                      <Table.Row>
+                        <Table.ColumnHeaderCell>
+                          Book Details
+                        </Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Author</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>ISBN</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Format</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Copies</Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>
+                          Condition
+                        </Table.ColumnHeaderCell>
+                        <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
+                      </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                      {books.map((book) => (
+                        <Table.Row key={book.id}>
+                          <Table.Cell>
+                            <Flex align="center" gap="3">
+                              <Avatar
+                                size="3"
+                                src={`https://covers.openlibrary.org/b/isbn/${book.isbn}-S.jpg`}
+                                fallback={book.title.charAt(0)}
+                              />
+                              <Flex direction="column">
+                                <Text weight="bold">{book.title}</Text>
+                                <Text size="2" color="gray">
+                                  {book.publishedYear} • {book.publisher}
+                                </Text>
+                                {book.genres.length > 0 && (
+                                  <Flex gap="1" mt="1">
+                                    {book.genres.slice(0, 2).map((genre) => (
+                                      <Badge
+                                        key={genre.id}
+                                        size="1"
+                                        variant="soft"
+                                      >
+                                        {genre.genre.name}
+                                      </Badge>
+                                    ))}
+                                    {book.genres.length > 2 && (
+                                      <Badge size="1" variant="soft">
+                                        +{book.genres.length - 2}
+                                      </Badge>
+                                    )}
+                                  </Flex>
+                                )}
+                              </Flex>
+                            </Flex>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Text>{book.author}</Text>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Text size="2" className="font-mono">
+                              {book.isbn}
+                            </Text>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Badge
+                              color={
+                                book.format === "PHYSICAL"
+                                  ? "blue"
+                                  : book.format === "EBOOK"
+                                  ? "green"
+                                  : "purple"
+                              }
+                            >
+                              {book.format}
+                            </Badge>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Text>
+                              {book.availableCopies}/{book.totalCopies}
+                            </Text>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Badge
+                              color={
+                                book.condition === "NEW"
+                                  ? "green"
+                                  : book.condition === "GOOD"
+                                  ? "blue"
+                                  : book.condition === "FAIR"
+                                  ? "yellow"
+                                  : "red"
+                              }
+                            >
+                              {book.condition}
+                            </Badge>
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Flex gap="2">
+                              <Button
+                                size="1"
+                                variant="soft"
+                                onClick={() =>
+                                  router.push(`/librarian/books/${book.id}`)
+                                }
+                              >
+                                Edit
+                              </Button>
+                              <Button size="1" variant="soft" color="red">
+                                Delete
+                              </Button>
+                            </Flex>
+                          </Table.Cell>
+                        </Table.Row>
+                      ))}
+                    </Table.Body>
+                  </Table.Root>
+                </Box>
+              </Box>
+            </Card>
+          </Tabs.Content>
         </Tabs.Root>
 
         {/* Create Notification Dialog */}
@@ -1386,6 +1682,246 @@ export default function LibrarianDashboard() {
                 }
               >
                 Confirm
+              </Button>
+            </Flex>
+          </Dialog.Content>
+        </Dialog.Root>
+
+        {/* Add Book Dialog */}
+        <Dialog.Root
+          open={showAddBookDialog}
+          onOpenChange={setShowAddBookDialog}
+        >
+          <Dialog.Content maxWidth="800px">
+            <Dialog.Title>Add New Book</Dialog.Title>
+            <Flex direction="column" gap="4">
+              <Grid columns="2" gap="3">
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Title *
+                  </Text>
+                  <TextField.Root
+                    placeholder="Book title"
+                    value={bookForm.title}
+                    onChange={(e) =>
+                      setBookForm({ ...bookForm, title: e.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Author *
+                  </Text>
+                  <TextField.Root
+                    placeholder="Author name"
+                    value={bookForm.author}
+                    onChange={(e) =>
+                      setBookForm({ ...bookForm, author: e.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    ISBN *
+                  </Text>
+                  <TextField.Root
+                    placeholder="ISBN number"
+                    value={bookForm.isbn}
+                    onChange={(e) =>
+                      setBookForm({ ...bookForm, isbn: e.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Published Year
+                  </Text>
+                  <TextField.Root
+                    type="number"
+                    placeholder="Year"
+                    value={bookForm.publishedYear.toString()}
+                    onChange={(e) =>
+                      setBookForm({
+                        ...bookForm,
+                        publishedYear:
+                          parseInt(e.target.value) || new Date().getFullYear(),
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Publisher
+                  </Text>
+                  <TextField.Root
+                    placeholder="Publisher name"
+                    value={bookForm.publisher}
+                    onChange={(e) =>
+                      setBookForm({ ...bookForm, publisher: e.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Language
+                  </Text>
+                  <Select.Root
+                    value={bookForm.language}
+                    onValueChange={(value) =>
+                      setBookForm({ ...bookForm, language: value })
+                    }
+                  >
+                    <Select.Trigger />
+                    <Select.Content>
+                      <Select.Item value="English">English</Select.Item>
+                      <Select.Item value="Vietnamese">Vietnamese</Select.Item>
+                      <Select.Item value="French">French</Select.Item>
+                      <Select.Item value="Spanish">Spanish</Select.Item>
+                      <Select.Item value="German">German</Select.Item>
+                      <Select.Item value="Chinese">Chinese</Select.Item>
+                      <Select.Item value="Japanese">Japanese</Select.Item>
+                      <Select.Item value="Other">Other</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Page Count
+                  </Text>
+                  <TextField.Root
+                    type="number"
+                    placeholder="Number of pages"
+                    value={bookForm.pageCount}
+                    onChange={(e) =>
+                      setBookForm({ ...bookForm, pageCount: e.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Total Copies
+                  </Text>
+                  <TextField.Root
+                    type="number"
+                    placeholder="Number of copies"
+                    value={bookForm.totalCopies.toString()}
+                    onChange={(e) =>
+                      setBookForm({
+                        ...bookForm,
+                        totalCopies: parseInt(e.target.value) || 1,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Location
+                  </Text>
+                  <TextField.Root
+                    placeholder="Shelf location (e.g., A1-B2)"
+                    value={bookForm.location}
+                    onChange={(e) =>
+                      setBookForm({ ...bookForm, location: e.target.value })
+                    }
+                  />
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Format
+                  </Text>
+                  <Select.Root
+                    value={bookForm.format}
+                    onValueChange={(value) =>
+                      setBookForm({ ...bookForm, format: value })
+                    }
+                  >
+                    <Select.Trigger />
+                    <Select.Content>
+                      <Select.Item value="PHYSICAL">Physical</Select.Item>
+                      <Select.Item value="DIGITAL">Digital</Select.Item>
+                      <Select.Item value="AUDIO">Audio</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </label>
+                <label>
+                  <Text as="div" size="2" mb="1" weight="bold">
+                    Condition
+                  </Text>
+                  <Select.Root
+                    value={bookForm.condition}
+                    onValueChange={(value) =>
+                      setBookForm({ ...bookForm, condition: value })
+                    }
+                  >
+                    <Select.Trigger />
+                    <Select.Content>
+                      <Select.Item value="NEW">New</Select.Item>
+                      <Select.Item value="GOOD">Good</Select.Item>
+                      <Select.Item value="FAIR">Fair</Select.Item>
+                      <Select.Item value="POOR">Poor</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </label>
+              </Grid>
+
+              <label>
+                <Text as="div" size="2" mb="1" weight="bold">
+                  Description
+                </Text>
+                <TextArea
+                  placeholder="Book description"
+                  value={bookForm.description}
+                  onChange={(e) =>
+                    setBookForm({ ...bookForm, description: e.target.value })
+                  }
+                  rows={4}
+                />
+              </label>
+
+              <label>
+                <Text as="div" size="2" mb="1" weight="bold">
+                  Genres
+                </Text>
+                <Box className="grid grid-cols-3 gap-2 p-3 border rounded">
+                  {genres.map((genre) => (
+                    <label key={genre.id} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={bookForm.genreIds.includes(genre.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setBookForm({
+                              ...bookForm,
+                              genreIds: [...bookForm.genreIds, genre.id],
+                            });
+                          } else {
+                            setBookForm({
+                              ...bookForm,
+                              genreIds: bookForm.genreIds.filter(
+                                (id) => id !== genre.id
+                              ),
+                            });
+                          }
+                        }}
+                      />
+                      <Text size="2">{genre.name}</Text>
+                    </label>
+                  ))}
+                </Box>
+              </label>
+            </Flex>
+
+            <Flex gap="3" mt="4" justify="end">
+              <Dialog.Close>
+                <Button variant="soft" color="gray">
+                  Cancel
+                </Button>
+              </Dialog.Close>
+              <Button
+                onClick={handleCreateBook}
+                disabled={!bookForm.title || !bookForm.author || !bookForm.isbn}
+              >
+                Add Book
               </Button>
             </Flex>
           </Dialog.Content>

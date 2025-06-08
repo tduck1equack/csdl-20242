@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Box, Card, Flex, Text, Heading, Badge } from "@radix-ui/themes";
+import {
+  Box,
+  Card,
+  Flex,
+  Text,
+  Heading,
+  Badge,
+  TextField,
+  Button,
+} from "@radix-ui/themes";
+import { MagnifyingGlassIcon, Cross2Icon } from "@radix-ui/react-icons";
 import axios from "axios";
 
 import Link from "next/link";
@@ -46,46 +56,75 @@ export default function BooksPage() {
   const [error, setError] = useState("");
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
-  const fetchBooks = useCallback(async (page = 1, append = false) => {
-    try {
-      if (page === 1) {
-        setIsLoading(true);
-      } else {
-        setIsLoadingMore(true);
-      }
+  const fetchBooks = useCallback(
+    async (page = 1, append = false, search = "") => {
+      try {
+        if (page === 1) {
+          setIsLoading(true);
+        } else {
+          setIsLoadingMore(true);
+        }
 
-      const response = await axios.get(`/api/books?page=${page}&limit=9`);
-      const data: BooksResponse = response.data;
-
-      if (append) {
-        setBooks((prevBooks) => {
-          // Create a set of existing book IDs to prevent duplicates
-          const existingIds = new Set(prevBooks.map((book) => book.id));
-          const newBooks = data.books.filter(
-            (book) => !existingIds.has(book.id)
-          );
-          return [...prevBooks, ...newBooks];
+        const searchParams = new URLSearchParams({
+          page: page.toString(),
+          limit: "9",
         });
-      } else {
-        setBooks(data.books);
-      }
 
-      setPagination(data.pagination);
-    } catch (error) {
-      console.error("Error fetching books:", error);
-      setError("Failed to load books");
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  }, []);
+        if (search) {
+          searchParams.append("search", search);
+        }
+
+        const response = await axios.get(`/api/books?${searchParams}`);
+        const data: BooksResponse = response.data;
+
+        if (append) {
+          setBooks((prevBooks) => {
+            // Create a set of existing book IDs to prevent duplicates
+            const existingIds = new Set(prevBooks.map((book) => book.id));
+            const newBooks = data.books.filter(
+              (book) => !existingIds.has(book.id)
+            );
+            return [...prevBooks, ...newBooks];
+          });
+        } else {
+          setBooks(data.books);
+        }
+
+        setPagination(data.pagination);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+        setError("Failed to load books");
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+        setIsSearching(false);
+      }
+    },
+    []
+  );
 
   const loadMoreBooks = useCallback(() => {
     if (pagination && pagination.hasNextPage && !isLoadingMore) {
-      fetchBooks(pagination.currentPage + 1, true);
+      fetchBooks(pagination.currentPage + 1, true, searchTerm);
     }
-  }, [pagination, isLoadingMore, fetchBooks]);
+  }, [pagination, isLoadingMore, fetchBooks, searchTerm]);
+
+  const handleSearch = useCallback(
+    async (term: string) => {
+      setSearchTerm(term);
+      setIsSearching(true);
+      await fetchBooks(1, false, term);
+    },
+    [fetchBooks]
+  );
+
+  const clearSearch = useCallback(() => {
+    setSearchTerm("");
+    fetchBooks(1, false, "");
+  }, [fetchBooks]);
 
   // Infinite scroll detection with debouncing
   useEffect(() => {
@@ -152,13 +191,69 @@ export default function BooksPage() {
         Our Book Collection
       </Heading>
 
+      {/* Search Bar */}
+      <Box className="mb-6">
+        <Flex gap="3" align="center">
+          <Box className="flex-1">
+            <TextField.Root
+              placeholder="Search books by title, author, or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch(searchTerm);
+                }
+              }}
+              size="3"
+            >
+              <TextField.Slot>
+                <MagnifyingGlassIcon height="16" width="16" />
+              </TextField.Slot>
+              {searchTerm && (
+                <TextField.Slot>
+                  <Button
+                    variant="ghost"
+                    size="1"
+                    onClick={clearSearch}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <Cross2Icon height="14" width="14" />
+                  </Button>
+                </TextField.Slot>
+              )}
+            </TextField.Root>
+          </Box>
+          <Button
+            onClick={() => handleSearch(searchTerm)}
+            disabled={isSearching}
+            size="3"
+          >
+            {isSearching ? "Searching..." : "Search"}
+          </Button>
+        </Flex>
+      </Box>
+
       <Text className="mb-6 text-gray-600">
-        Browse through our extensive collection of{" "}
-        {pagination?.totalBooks || books.length} books
-        {pagination && (
-          <span className="block text-sm mt-1">
-            Showing {books.length} of {pagination.totalBooks} books
-          </span>
+        {searchTerm ? (
+          <>
+            Search results for "{searchTerm}" - {pagination?.totalBooks || 0}{" "}
+            books found
+            {pagination && (
+              <span className="block text-sm mt-1">
+                Showing {books.length} of {pagination.totalBooks} books
+              </span>
+            )}
+          </>
+        ) : (
+          <>
+            Browse through our extensive collection of{" "}
+            {pagination?.totalBooks || books.length} books
+            {pagination && (
+              <span className="block text-sm mt-1">
+                Showing {books.length} of {pagination.totalBooks} books
+              </span>
+            )}
+          </>
         )}
       </Text>
 
