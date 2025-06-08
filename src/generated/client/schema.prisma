@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String         @id @default(uuid())
+  email            String         @unique
+  name             String
+  password         String
+  role             Role           @default(USER)
+  profileImage     String?
+  phoneNumber      String?
+  address          String?
+  dateOfBirth      DateTime?
+  memberSince      DateTime       @default(now())
+  membershipStatus MemberStatus   @default(ACTIVE)
+  borrowings       Borrowing[]
+  reviews          Review[]
+  reservations     Reservation[]
+  fines            Fine[]
+  notifications    Notification[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model Book {
+  id              String        @id @default(uuid())
+  title           String
+  author          String
+  isbn            String        @unique
+  publishedYear   Int
+  publisher       String?
+  language        String        @default("English")
+  pageCount       Int?
+  description     String        @default("")
+  totalCopies     Int           @default(1)
+  availableCopies Int           @default(1)
+  coverImage      String?
+  location        String? // Physical location in the library (e.g., "Section A, Shelf 3")
+  deweyDecimal    String? // Dewey Decimal classification
+  format          BookFormat    @default(PHYSICAL)
+  condition       BookCondition @default(GOOD)
+  borrowings      Borrowing[]
+  reviews         Review[]
+  reservations    Reservation[]
+  genres          BookGenre[] // Many-to-many relationship with Genre
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Genre {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  description String?
+  books       BookGenre[] // Many-to-many relationship with Book
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model BookGenre {
+  id      String @id @default(uuid())
+  bookId  String
+  genreId String
+  book    Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, genreId]) // Prevent duplicate book-genre combinations
+}
+
+model Borrowing {
+  id           String       @id @default(uuid())
+  userId       String
+  bookId       String
+  borrowDate   DateTime     @default(now())
+  dueDate      DateTime
+  returnDate   DateTime?
+  status       BorrowStatus @default(BORROWED)
+  renewalCount Int          @default(0)
+  returnNotes  String?
+  processedBy  String? // ID of the librarian who processed this transaction
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book         Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  fine         Fine?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  bookId    String
+  rating    Int // 1-5 stars
+  comment   String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, bookId]) // A user can only review a book once
+}
+
+model Reservation {
+  id              String            @id @default(uuid())
+  userId          String
+  bookId          String
+  reservationDate DateTime          @default(now())
+  status          ReservationStatus @default(PENDING)
+  notified        Boolean           @default(false)
+  expiryDate      DateTime? // When the reservation expires if not claimed
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book            Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Fine {
+  id          String     @id @default(uuid())
+  userId      String
+  borrowingId String     @unique
+  amount      Float
+  reason      String
+  status      FineStatus @default(UNPAID)
+  paidDate    DateTime?
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  borrowing   Borrowing  @relation(fields: [borrowingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+enum Role {
+  USER
+  LIBRARIAN
+  ADMIN
+}
+
+enum MemberStatus {
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
+enum BorrowStatus {
+  BORROWED
+  RETURNED
+  OVERDUE
+  LOST
+  DAMAGED
+}
+
+enum BookFormat {
+  PHYSICAL
+  EBOOK
+  AUDIOBOOK
+}
+
+enum BookCondition {
+  NEW
+  GOOD
+  FAIR
+  POOR
+}
+
+enum ReservationStatus {
+  PENDING
+  READY
+  CLAIMED
+  EXPIRED
+  CANCELLED
+}
+
+enum FineStatus {
+  UNPAID
+  PAID
+  WAIVED
+}
+
+enum NotificationType {
+  DUE_DATE_REMINDER
+  OVERDUE_NOTICE
+  RESERVATION_READY
+  FINE_ISSUED
+  GENERAL
+}
