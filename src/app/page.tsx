@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       <div className="container mx-auto px-4 py-16 flex flex-col items-center">
-        {user && (
+        {/* {user && (
           <div className="mb-8 text-center">
             <Text size="4" className="text-blue-600">
               Welcome back, {user.name}!
@@ -20,7 +20,7 @@ export default function Home() {
               Role: {user.role}
             </Text>
           </div>
-        )}
+        )} */}
 
         <Heading size="9" className="text-center mb-6">
           Welcome to the Library Management System
