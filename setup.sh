@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "This is the script to set up the Library Management System project for my Database class, term 2024.2"
 echo "🚀 Setting up Library Management System..."
 
 # Check if .env exists
@@ -7,7 +7,7 @@ if [ ! -f .env ]; then
     echo "📝 Creating .env file..."
     cp .env.example .env
     echo "⚠️  Please update DATABASE_URL in .env file with your PostgreSQL connection string"
-    echo "   Example: DATABASE_URL=\"postgresql://username:password@localhost:5432/library_db?schema=public\""
+    echo "   Example: DATABASE_URL=\"postgresql://postgres:password@localhost:5432/library_db?schema=public\""
     read -p "Press enter when you've updated the .env file..."
 fi
 
