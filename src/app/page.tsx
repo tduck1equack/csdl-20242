@@ -22,15 +22,15 @@ export default function Home() {
           </div>
         )} */}
 
-        <Heading size="9" className="text-center mb-6">
+        <Heading size="9" className="text-center">
           Welcome to the Library Management System
         </Heading>
 
-        <div className="w-full max-w-4xl mb-12">
+        <div className="w-full max-w-4xl mb-12 mt-12">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="relative h-64 sm:h-80">
               <Image
-                src="/next.svg"
+                src="/library.jpg"
                 alt="Library"
                 width={2000}
                 height={800}
@@ -42,7 +42,7 @@ export default function Home() {
               <Heading size="5" className="mb-4">
                 Discover, Borrow, and Return Books with Ease
               </Heading>
-              <Text as="p" size="3" className="mb-6 text-gray-600">
+              <Text as="p" size="3" className="my-24 text-gray-600">
                 Our library management system provides a seamless experience for
                 users to explore our extensive collection, borrow books, and
                 manage returns. Choose your access level below.
