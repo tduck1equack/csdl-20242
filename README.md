@@ -33,8 +33,6 @@ The database schema has been enhanced to provide a more comprehensive library ma
 - **Fine Management** for tracking and processing late fees and damages
 - **Notification System** for due dates, reservations, and other library communications
 
-For more details, see [SCHEMA_ENHANCEMENTS.md](./SCHEMA_ENHANCEMENTS.md).
-
 ## Features
 
 ### Access Model
@@ -121,27 +119,19 @@ chmod +x start.sh
 ./start.sh
 ```
 
-## Applying Schema Enhancements
+In addition, you can use the SQL dump file located in /backup/sql to initialize your database
 
-To apply the enhanced database schema and updated API endpoints:
-
-1. Make sure your PostgreSQL database is running
-2. Run the enhancement script:
-   ```
-   chmod +x apply_schema_enhancements.sh
-   ./apply_schema_enhancements.sh
-   ```
-3. Restart your application
-   ```
-   npm run dev
-   ```
+```
+cd backup/sql
+psql -U postgres -d library_management -f library_management.sql
+```
 
 ## Using the Application
 
 After starting the application, you can access the different dashboards directly:
 
 - **Home Page**: http://localhost:3000
-- **User Dashboard**: http://localhost:3000/user/dashboard
+- **User Dashboard**: http://localhost:3000/dashboard
 - **Librarian Dashboard**: http://localhost:3000/librarian/dashboard
 - **Admin Dashboard**: http://localhost:3000/admin/dashboard
 - **Books Browser**: http://localhost:3000/books
