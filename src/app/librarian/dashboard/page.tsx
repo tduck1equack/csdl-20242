@@ -215,6 +215,9 @@ export default function LibrarianDashboard() {
 
   // Book management state
   const [showAddBookDialog, setShowAddBookDialog] = useState(false);
+  const [showDeleteBookDialog, setShowDeleteBookDialog] = useState(false);
+  const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
+  const [deletingBook, setDeletingBook] = useState(false);
   const [bookForm, setBookForm] = useState({
     title: "",
     author: "",
@@ -563,6 +566,36 @@ export default function LibrarianDashboard() {
     } catch (error) {
       console.error("Error creating book:", error);
     }
+  };
+
+  const handleDeleteBook = async () => {
+    if (!bookToDelete) return;
+
+    setDeletingBook(true);
+    try {
+      const response = await fetch(`/api/librarian/books/${bookToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        await fetchBooks();
+        setShowDeleteBookDialog(false);
+        setBookToDelete(null);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Failed to delete book");
+      }
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      alert("Failed to delete book");
+    } finally {
+      setDeletingBook(false);
+    }
+  };
+
+  const confirmDeleteBook = (book: Book) => {
+    setBookToDelete(book);
+    setShowDeleteBookDialog(true);
   };
 
   const getStatusBadge = (status: string, isOverdue?: boolean) => {
@@ -1297,7 +1330,12 @@ export default function LibrarianDashboard() {
                               >
                                 Edit
                               </Button>
-                              <Button size="1" variant="soft" color="red">
+                              <Button
+                                size="1"
+                                variant="soft"
+                                color="red"
+                                onClick={() => confirmDeleteBook(book)}
+                              >
                                 Delete
                               </Button>
                             </Flex>
@@ -1922,6 +1960,73 @@ export default function LibrarianDashboard() {
                 disabled={!bookForm.title || !bookForm.author || !bookForm.isbn}
               >
                 Add Book
+              </Button>
+            </Flex>
+          </Dialog.Content>
+        </Dialog.Root>
+
+        {/* Delete Book Confirmation Dialog */}
+        <Dialog.Root
+          open={showDeleteBookDialog}
+          onOpenChange={setShowDeleteBookDialog}
+        >
+          <Dialog.Content maxWidth="500px">
+            <Dialog.Title>Delete Book</Dialog.Title>
+            <Flex direction="column" gap="4">
+              <Text>
+                Are you sure you want to delete "{bookToDelete?.title}"? This
+                action cannot be undone.
+              </Text>
+
+              {bookToDelete && (
+                <Box className="p-4 bg-gray-50 rounded-lg">
+                  <Flex align="center" gap="3">
+                    <Avatar
+                      size="3"
+                      src={`https://covers.openlibrary.org/b/isbn/${bookToDelete.isbn}-S.jpg`}
+                      fallback={bookToDelete.title.charAt(0)}
+                    />
+                    <Flex direction="column">
+                      <Text weight="bold">{bookToDelete.title}</Text>
+                      <Text size="2" color="gray">
+                        by {bookToDelete.author}
+                      </Text>
+                      <Text size="2" color="gray">
+                        ISBN: {bookToDelete.isbn}
+                      </Text>
+                      <Text size="2" color="gray">
+                        {bookToDelete.availableCopies}/
+                        {bookToDelete.totalCopies} copies available
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Box>
+              )}
+
+              <Box className="p-3 bg-red-50 border border-red-200 rounded">
+                <Text size="2" color="red" weight="bold">
+                  Warning:
+                </Text>
+                <Text size="2" color="red">
+                  This will permanently delete the book and all associated data
+                  including reviews. Books with active borrowings or
+                  reservations cannot be deleted.
+                </Text>
+              </Box>
+            </Flex>
+
+            <Flex gap="3" mt="4" justify="end">
+              <Dialog.Close>
+                <Button variant="soft" color="gray" disabled={deletingBook}>
+                  Cancel
+                </Button>
+              </Dialog.Close>
+              <Button
+                color="red"
+                onClick={handleDeleteBook}
+                disabled={deletingBook}
+              >
+                {deletingBook ? "Deleting..." : "Delete Book"}
               </Button>
             </Flex>
           </Dialog.Content>
